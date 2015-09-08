@@ -19,7 +19,7 @@ class Application
       print_help
     when "new"
       contact_info = get_contact_info
-      Contact.create(contact_info[1], contact_info[2])
+      Contact.create(contact_info[1], contact_info[2]) if contact_info != nil
     when "list"
       puts Contact.all
     when "show"
@@ -41,12 +41,17 @@ class Application
 
   # Gets from $stdin the name and email for a new contact, returns array [id, name, email]
   def get_contact_info
-    puts "Enter contact name:"
-    name = $stdin.readline().chomp
     puts "Enter email address:"
     email = $stdin.readline().chomp
-    id = ContactDatabase.read.length + 1
-    return [id, name, email]
+    if Contact.contact_exists?(email)
+      puts "You've already added this contact!"
+      return nil
+    else
+        puts "Enter contact name:"
+        name = $stdin.readline().chomp
+        id = ContactDatabase.read.length + 1
+        return [id, name, email]
+    end
   end
 
 end

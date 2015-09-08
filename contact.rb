@@ -43,6 +43,12 @@ class Contact
       puts "Name: #{matches[0][1]}, email: #{matches[0][2]}"
     end
 
+    def contact_exists?(email)
+      all_contacts = ContactDatabase.read
+      same_email_matches = all_contacts.select {|entry| entry[2].include?(email)}
+      same_email_matches.empty? ? false : true
+    end
+
   end
 
 end
