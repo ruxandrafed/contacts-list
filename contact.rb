@@ -35,7 +35,7 @@ class Contact
 
     # Return the list of contacts, as is
     def all
-      ContactDatabase.read.each{|arr| puts "#{arr[0]}: #{arr[1]} (#{arr[2]})"}
+      ContactDatabase.read.each{|arr| puts "#{arr[0]}: #{arr[1]} (#{arr[2]}; #{arr[3].gsub(/[\[\]""]/, "")})"}
     end
 
     # Shows a contact based on ID
