@@ -14,7 +14,7 @@ class Application
   end
 
   # Runs application
-  def run_command
+  def run
     case @command
     when 'help'
       print_help
@@ -22,18 +22,11 @@ class Application
       contact_info = get_contact_info
       Contact.create(contact_info[1], contact_info[2], contact_info[3]) if contact_info != nil
     when 'list'
-      all_contacts = Contact.all
-      list_contacts(all_contacts)
+      list_contacts(Contact.all)
     when 'show'
-      matches = Contact.show(@command_param)
-      if matches.empty?
-        puts 'Contact not found!'
-      else
-          puts "Name: #{matches[0][1]}\nEmail: #{matches[0][2]}\nPhone numbers: #{matches[0][3].gsub(/[\[\]""]/, "")}"
-      end
+      print_matches_for_id(Contact.show(@command_param))
     when 'find'
-      matches = Contact.find(@command_param)
-      matches.each {|match| puts "Name: #{match[1]}\nEmail: #{match[2]}\nPhone numbers: #{match[3].gsub(/[\[\]""]/, "")}"}
+      print_matches_for_term(Contact.find(@command_param))
     end
   end
 
@@ -75,6 +68,23 @@ class Application
       index += 5
     end
   end
+
+  def print_matches_for_id(arr)
+    if arr.empty?
+      puts 'Contact not found!'
+    else
+      puts "Name:\t#{arr[0][1]}\nEmail:\t#{arr[0][2]}\nPhone:\t#{arr[0][3].gsub(/[\[\]""]/, "")}"
+    end
+  end
+
+  def print_matches_for_term(arr)
+    if arr.empty?
+      puts 'Contact not found!'
+    else
+      arr.each {|match| puts "Name:\t#{match[1]}\nEmail:\t#{match[2]}\nPhone:\t#{match[3].gsub(/[\[\]""]/, "")}"}
+    end
+  end
+
 end
 
-Application.new.run_command
+Application.new.run
