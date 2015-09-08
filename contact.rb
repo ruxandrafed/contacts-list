@@ -34,14 +34,14 @@ class Contact
 
     # Return the list of contacts, as is
     def all
-      ContactDatabase.read.each{|arr| arr.join(", ")}
+      ContactDatabase.read.each{|arr| puts "#{arr[0]}: #{arr[1]} (#{arr[2]})"}
     end
 
     # Shows a contact based on ID
     def show(id)
       all_contacts = ContactDatabase.read
       matches = all_contacts.select {|entry| entry[0] == id.to_s}
-      puts "Name: #{matches[0][1]}, email: #{matches[0][2]}"
+      matches.empty? ? "Contact not found!" : "Name: #{matches[0][1]}\nEmail: #{matches[0][2]}"
     end
 
     # Checks if an entry with the same email address already exits in the database

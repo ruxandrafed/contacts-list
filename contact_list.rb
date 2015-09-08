@@ -23,9 +23,9 @@ class Application
       contact_info = get_contact_info
       Contact.create(contact_info[1], contact_info[2]) if contact_info != nil
     when "list"
-      puts Contact.all
+      Contact.all
     when "show"
-      Contact.show(@command_param)
+      puts Contact.show(@command_param)
     when "find"
       matches = Contact.find(@command_param)
       matches.each {|match| puts "Name: #{match[1]}, email: #{match[2]}"}
