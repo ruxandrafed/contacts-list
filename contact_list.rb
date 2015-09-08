@@ -1,3 +1,5 @@
+#!/usr/bin/ruby
+
 require_relative 'contact_database'
 require_relative 'contact'
 
@@ -32,7 +34,7 @@ class Application
     end
   end
 
-  #private
+  private
 
   # Prints help menu with command options
   def print_help
