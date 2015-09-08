@@ -3,9 +3,6 @@ require 'io/console'
 require_relative 'contact_database'
 require_relative 'contact'
 
-# TODO: Implement command line interaction
-# This should be the only file where you use puts and gets
-
 @filename = 'contacts.csv'
 
 class Application
@@ -78,8 +75,6 @@ class Application
       index += 5
     end
   end
-
 end
 
 Application.new.run_command
-
