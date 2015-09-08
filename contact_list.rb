@@ -17,18 +17,18 @@ class Application
   # Runs application
   def run_command
     case @command
-    when "help"
+    when 'help'
       print_help
-    when "new"
+    when 'new'
       contact_info = get_contact_info
-      Contact.create(contact_info[1], contact_info[2]) if contact_info != nil
-    when "list"
+      Contact.create(contact_info[1], contact_info[2], contact_info[3]) if contact_info != nil
+    when 'list'
       Contact.all
-    when "show"
+    when 'show'
       puts Contact.show(@command_param)
-    when "find"
+    when 'find'
       matches = Contact.find(@command_param)
-      matches.each {|match| puts "Name: #{match[1]}, email: #{match[2]}"}
+      matches.each {|match| puts "Name: #{match[1]}\nEmail: #{match[2]}\nPhone numbers: #{match[3].gsub(/[\[\]""]/, "")}"}
     end
   end
 
@@ -36,25 +36,27 @@ class Application
 
   # Prints help menu with command options
   def print_help
-    puts "Here is a list of available commands:"
-    puts "\t new  - Create a new contact"
-    puts "\t list - List all contacts"
-    puts "\t show - Show a contact"
-    puts "\t find - Find a contact"
+    puts 'Here is a list of available commands:'
+    puts '- new  - Create a new contact'
+    puts '- list - List all contacts'
+    puts '- show - Show a contact'
+    puts '- find - Find a contact'
   end
 
   # Gets the name and email for a new contact, returns array with id, name, email
   def get_contact_info
-    puts "Enter email address:"
+    puts 'Enter email address:'
     email = $stdin.readline().chomp
     if Contact.contact_exists?(email)
-      puts "You've already added this contact!"
+      puts 'You\'ve already added this contact!'
       return nil
     else
-        puts "Enter contact name:"
+        puts 'Enter contact name:'
         name = $stdin.readline().chomp
+        puts 'Enter phone numbers: (e.g. mobile 604-678-3456, home 345-234-3456'
+        phone_numbers = $stdin.readline().chomp.split(", ")
         id = ContactDatabase.read.length + 1
-        return [id, name, email]
+        return [id, name, email, phone_numbers]
     end
   end
 

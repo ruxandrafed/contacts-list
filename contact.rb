@@ -20,10 +20,11 @@ class Contact
   class << self
 
     # Initializes a contact and adds it to the list of contacts
-    def create(name, email)
+    def create(name, email, phone_numbers)
       @name = name
       @email = email
-      ContactDatabase.write([@name, @email])
+      @phone_numbers = phone_numbers.to_a
+      ContactDatabase.write([@name, @email, @phone_numbers])
     end
 
     # Fnds and returns contacts that contain the term in the first name, last name or email
@@ -41,7 +42,7 @@ class Contact
     def show(id)
       all_contacts = ContactDatabase.read
       matches = all_contacts.select {|entry| entry[0] == id.to_s}
-      matches.empty? ? "Contact not found!" : "Name: #{matches[0][1]}\nEmail: #{matches[0][2]}"
+      matches.empty? ? 'Contact not found!' : "Name: #{matches[0][1]}\nEmail: #{matches[0][2]}\nPhone numbers: #{matches[0][3].gsub(/[\[\]""]/, "")}"
     end
 
     # Checks if an entry with the same email address already exits in the database
