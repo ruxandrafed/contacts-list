@@ -3,7 +3,6 @@ require 'csv'
 
 class ContactDatabase
 
-  ## Class Methods
   class << self
 
     # Reads content from @filename CSV and returns array of entries
@@ -18,7 +17,5 @@ class ContactDatabase
       csv << arr.unshift(starting_id)
       end
     end
-
   end
-
 end
