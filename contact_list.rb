@@ -1,5 +1,5 @@
 #!/usr/bin/ruby
-
+require 'io/console'
 require_relative 'contact_database'
 require_relative 'contact'
 
@@ -25,9 +25,15 @@ class Application
       contact_info = get_contact_info
       Contact.create(contact_info[1], contact_info[2], contact_info[3]) if contact_info != nil
     when 'list'
-      Contact.all
+      all_contacts = Contact.all
+      list_contacts(all_contacts)
     when 'show'
-      puts Contact.show(@command_param)
+      matches = Contact.show(@command_param)
+      if matches.empty?
+        puts 'Contact not found!'
+      else
+          puts "Name: #{matches[0][1]}\nEmail: #{matches[0][2]}\nPhone numbers: #{matches[0][3].gsub(/[\[\]""]/, "")}"
+      end
     when 'find'
       matches = Contact.find(@command_param)
       matches.each {|match| puts "Name: #{match[1]}\nEmail: #{match[2]}\nPhone numbers: #{match[3].gsub(/[\[\]""]/, "")}"}
@@ -59,6 +65,17 @@ class Application
         phone_numbers = $stdin.readline().chomp.split(", ")
         id = ContactDatabase.read.length + 1
         return [id, name, email, phone_numbers]
+    end
+  end
+
+  def list_contacts(arr)
+    puts 'Showing list of contacts (to see more than five, press space):'
+    index = 0
+    while index < arr.size
+      arr[index,5].each{|arr| puts "#{arr[0]}: #{arr[1]} (#{arr[2]}; #{arr[3].gsub(/[\[\]""]/, "")})"}
+      keep_showing = $stdin.getch
+      break if keep_showing != " "
+      index += 5
     end
   end
 
