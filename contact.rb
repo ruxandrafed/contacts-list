@@ -18,31 +18,33 @@ class Contact
 
   ## Class Methods
   class << self
+
+    # Initializes a contact and adds it to the list of contacts
     def create(name, email)
-      # TODO: Will initialize a contact as well as add it to the list of contacts
       @name = name
       @email = email
       ContactDatabase.write([@name, @email])
     end
 
+    # Fnds and returns contacts that contain the term in the first name, last name or email
     def find(term)
-      # TODO: Will find and return contacts that contain the term in the first name, last name or email
       all_contacts = ContactDatabase.read
       matches = all_contacts.select {|entry| entry.to_s.include? (term)}
     end
 
+    # Return the list of contacts, as is
     def all
-      # TODO: Return the list of contacts, as is
       ContactDatabase.read.each{|arr| arr.join(", ")}
     end
 
+    # Shows a contact based on ID
     def show(id)
-      # TODO: Show a contact, based on ID
       all_contacts = ContactDatabase.read
       matches = all_contacts.select {|entry| entry[0] == id.to_s}
       puts "Name: #{matches[0][1]}, email: #{matches[0][2]}"
     end
 
+    # Checks if an entry with the same email address already exits in the database
     def contact_exists?(email)
       all_contacts = ContactDatabase.read
       same_email_matches = all_contacts.select {|entry| entry[2].include?(email)}

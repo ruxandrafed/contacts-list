@@ -8,11 +8,13 @@ require_relative 'contact'
 
 class Application
 
+  # Initializes class and gets the command and command param from user input
   def initialize
       @command = ARGV[0]
       @command_param = ARGV[1]
   end
 
+  # Runs application
   def run_command
     case @command
     when "help"
@@ -31,6 +33,8 @@ class Application
   end
 
   #private
+
+  # Prints help menu with command options
   def print_help
     puts "Here is a list of available commands:"
     puts "\t new  - Create a new contact"
@@ -39,7 +43,7 @@ class Application
     puts "\t find - Find a contact"
   end
 
-  # Gets from $stdin the name and email for a new contact, returns array [id, name, email]
+  # Gets the name and email for a new contact, returns array with id, name, email
   def get_contact_info
     puts "Enter email address:"
     email = $stdin.readline().chomp
@@ -57,6 +61,4 @@ class Application
 end
 
 Application.new.run_command
-
-# a = ContactDatabase.write([12, 'Numele','abc@abc.com'])
 

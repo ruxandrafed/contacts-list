@@ -22,5 +22,3 @@ class ContactDatabase
   end
 
 end
-
-# a = ContactDatabase.write([12, 'Numele','abc@abc.com'])
