@@ -1,48 +1,96 @@
 require 'csv'
-require 'pry'
+require 'pry-nav'
+require 'pg'
 
 class Contact
 
-  attr_accessor :name, :email
+  attr_accessor :firstname, :lastname, :email, :id
 
-  def initialize(name, email)
-    @name = name
+  def initialize(firstname, lastname, email, id=nil)
+    @firstname = firstname
+    @lastname = lastname
     @email = email
+    @id = id
   end
 
   def to_s
     "Name: #{@name}, Email: #{email}"
   end
 
+  # Updates or saves a contact to the database, returns the id
+  def save
+    if @id
+      Contact.connection.exec_params("UPDATE contacts SET firstname=$1, lastname=$2, email=$3 WHERE id=$4 RETURNING id;", [@firstname, @lastname, @email, @id])
+    else
+      Contact.connection.exec_params("INSERT INTO contacts (firstname, lastname, email) VALUES ($1, $2, $3) RETURNING id;", [@firstname, @lastname, @email])
+    end
+  end
+
+  def destroy
+    Contact.connection.exec_params("DELETE FROM contacts WHERE id = $1;", [@id])
+  end
+
   class << self
 
+    # Establishes connection and returns connection object
+    def connection
+      PG.connect(
+        host: 'localhost',
+        dbname: 'contactlist',
+        user: 'development',
+        password: 'development'
+        )
+    end
+
     # Initializes a contact and adds it to the list of contacts
-    def create(name, email, phone_numbers)
-      @name = name
-      @email = email
-      @phone_numbers = phone_numbers.to_a
-      ContactDatabase.write([@name, @email, @phone_numbers])
+    def create(firstname, lastname, email)
+      contact = Contact.new(firstname, lastname, email)
+      contact.id = contact.save
     end
 
-    # Finds and returns contacts that contain the term in the first name, last name or email
-    def find(term)
-      matches = ContactDatabase.read.select {|entry| entry.to_s.include? (term)}
+    # Find a contact based on last name; returns an array of hashes
+    def find_all_by_lastname(term)
+      run_query("SELECT * FROM contacts WHERE lastname = $1;", [term])
     end
 
-    # Return the list of contacts, as is
+    # Find a contact based on first name; returns an array of hashes
+    def find_all_by_firstname(term)
+      run_query("SELECT * FROM contacts WHERE firstname = $1;", [term])
+    end
+
+    # Find a contact based on email; returns a hash
+    def find_by_email(term)
+      run_query("SELECT * FROM contacts WHERE email = $1;", [term])[0]
+    end
+
+    # Find a contact based on ID; returns a Contact instance or nil if no contact found
+    def find(id)
+      run_query("SELECT * FROM contacts WHERE id = $1;", [id])[0]
+    end
+
+    # Return the list of contacts as an array of Contact instances
     def all
-      ContactDatabase.read
+      run_query("SELECT * FROM contacts;")
     end
 
-    # Shows a contact based on ID
-    def show(id)
-      matches = ContactDatabase.read.select {|entry| entry[0] == id.to_s}
+    def delete(id)
+      if find(id)
+        find(id).destroy
+        puts "Contact with id #{id} was deleted!"
+      else
+          puts "No contact with this ID!"
+          nil
+      end
     end
 
-    # Checks if an entry with the same email address already exits in the database
-    def contact_exists?(email)
-      same_email_matches = ContactDatabase.read.select {|entry| entry[2].include?(email)}
-      same_email_matches.empty? ? false : true
+    # Takes a SQL query and params and returns an array of matching Contact instances
+    def run_query(query, params=nil)
+      matching_contacts = []
+      connection.exec_params(query, params).each do |row|
+        contact = Contact.new(row['firstname'], row['lastname'], row['email'], row['id'].to_i)
+      matching_contacts << contact
+      end
+      return matching_contacts
     end
 
   end
