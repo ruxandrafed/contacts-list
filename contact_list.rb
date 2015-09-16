@@ -26,11 +26,11 @@ class Application
 
     when 'show'
       print_match(Contact.find(@command_param))
-    when 'findF'
+    when 'find:f'
       print_matches(Contact.find_all_by_firstname(@command_param))
-    when 'findL'
+    when 'find:l'
       print_matches(Contact.find_all_by_lastname(@command_param))
-    when 'findE'
+    when 'find:e'
       print_match(Contact.find_by_email(@command_param))
 
     when 'delete'
@@ -81,9 +81,9 @@ class Application
     puts '- new  - Create a new contact'
     puts '- list - List all contacts'
     puts '- show - Show a contact'
-    puts '- findF - Find a contact by first name'
-    puts '- findL - Find a contact by last name'
-    puts '- findE - Find a contact by email'
+    puts '- find:f - Find a contact by first name'
+    puts '- find:l - Find a contact by last name'
+    puts '- find:e - Find a contact by email'
     puts '- update - Update contact info by id'
     puts '- delete - Delete a contact by id'
   end
