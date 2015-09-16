@@ -1,5 +1,6 @@
 #!/usr/bin/ruby
 require 'io/console'
+require 'colorize'
 require_relative 'contact'
 
 class Application
@@ -36,36 +37,36 @@ class Application
     when 'delete'
       if Contact.find(@command_param)
         Contact.delete(@command_param)
-        puts "Contact with id #{@command_param} was deleted!"
+        puts "Contact with id #{@command_param} was deleted!".colorize(:green)
       else
-        puts "No contact with this ID!"
+        puts "No contact with this ID!".colorize(:red)
       end
 
     when 'update'
-      puts 'Which contact do you want to update? Please give me the id:'
+      puts 'Which contact do you want to update? Please give me the id:'.colorize(:red)
       id_to_update = $stdin.readline().chomp.to_i
-      puts "Current information for contact with ID #{id_to_update}:"
+      puts "Current information for contact with ID #{id_to_update}:".colorize(:green)
       print_match(Contact.find(id_to_update))
-      puts "\nWhat do you want to update? 1 for first name, 2 for last name, 3 for email, 4 for phone numbers:"
+      puts "\nWhat do you want to update? 1 for first name, 2 for last name, 3 for email, 4 for phone numbers:".colorize(:red)
       update_option = $stdin.readline().chomp
       case update_option
       when '1'
         field_to_update = 'first name'
-        puts 'Insert new first name:'
+        print 'Insert new first name: '.colorize(:red)
         new_value = $stdin.readline().chomp
       when '2'
         field_to_update = 'last name'
-        puts 'Insert new last name:'
+        print 'Insert new last name: '.colorize(:red)
         new_value = $stdin.readline().chomp
       when '3'
         field_to_update = 'email'
-        puts 'Insert new email:'
+        print 'Insert new email: '.colorize(:red)
         new_value = $stdin.readline().chomp
       when '4'
         field_to_update = 'phone numbers'
-        puts 'Which phone number to update? (e.g. mobile, home)'
+        print 'Which phone number to update? (e.g. mobile, home) '.colorize(:red)
         ph_number_option = $stdin.readline().chomp
-        puts 'Insert new value:'
+        print 'Insert new value: '.colorize(:red)
         new_value = $stdin.readline().chomp
       end
       update_contact(id_to_update, field_to_update, new_value, ph_number_option)
@@ -90,15 +91,15 @@ class Application
 
   # Gets the name and email for a new contact, returns array with id, name, email, phone numbers
   def get_contact_info
-    puts 'Enter email address:'
+    print "Enter email address:\s".colorize(:blue)
     email = $stdin.readline().chomp
     if Contact.find_by_email(email)
       puts 'You\'ve already added this contact!'
       return nil
     else
-        puts 'Enter first name:'
+        print "Enter first name:\s".colorize(:blue)
         firstname = $stdin.readline().chomp
-        puts 'Enter last name:'
+        print "Enter last name:\s".colorize(:blue)
         lastname = $stdin.readline().chomp
 
         @list_of_numbers = []
@@ -111,9 +112,9 @@ class Application
   # Prompts user for multiple phone numbers; returns array of phone numbers (array of arrays)
   def read_phone_numbers
     while @keep_looping
-          puts 'Enter phone number: (e.g. mobile 6046783456) or DONE if finished'
+          puts "Enter phone number: (e.g. mobile 604..; use mobile1, mobile2 if multiple). Type 'done' if finished".colorize(:blue)
           user_input = $stdin.readline.chomp
-          if user_input == 'DONE'
+          if user_input == 'done'
             @keep_looping = false
           else
             @list_of_numbers << user_input.split(" ")
@@ -124,10 +125,10 @@ class Application
 
   # Takes an array of Contact instances and outputs five at a time, with more shown when user hits space
   def list_contacts(arr)
-    puts 'Showing list of contacts (to see more than five, press space):'
+    puts 'Showing list of contacts (to see more than five, press space):'.colorize(:blue)
     index = 0
     while index < arr.size
-      arr[index,5].each{|entry| puts "\nID:\t\t#{entry.id}\nFirst name:\t#{entry.firstname}\nLast name:\t#{entry.lastname}\nEmail:\t\t#{entry.email}\nPhone numbers:\t#{entry.phone_numbers.join(" ")}"}
+      arr[index,5].each{|entry| puts "\nID:\t\t#{entry.id}\nFirst name:\t#{entry.firstname}\nLast name:\t#{entry.lastname}\nEmail:\t\t#{entry.email}\nPhone numbers:\t#{entry.phone_numbers.join(" ")}".colorize(:yellow)}
       keep_showing = $stdin.getch
       break if keep_showing != " "
       index += 5
@@ -137,18 +138,18 @@ class Application
   # Takes a Contact instance and outputs info about it
   def print_match(entry)
     if entry
-      puts "\nID:\t\t#{entry.id}\nFirst name:\t#{entry.firstname}\nLast name:\t#{entry.lastname}\nEmail:\t\t#{entry.email}\nPhone numbers:\t#{entry.phone_numbers.join(" ")}"
+      puts "\nID:\t\t#{entry.id}\nFirst name:\t#{entry.firstname}\nLast name:\t#{entry.lastname}\nEmail:\t\t#{entry.email}\nPhone numbers:\t#{entry.phone_numbers.join(" ")}".colorize(:yellow)
     else
-      puts "\nContact not found!"
+      puts "Contact not found!"
     end
   end
 
   # Takes an array of Contact instances and outputs info about each
   def print_matches(matches)
     if matches != []
-      matches.each {|entry| puts "\nID:\t\t#{entry.id}\nFirst name:\t#{entry.firstname}\nLast name:\t#{entry.lastname}\nEmail:\t\t#{entry.email}\nPhone numbers:\t#{entry.phone_numbers.join(" ")}\n"}
+      matches.each {|entry| puts "\nID:\t\t#{entry.id}\nFirst name:\t#{entry.firstname}\nLast name:\t#{entry.lastname}\nEmail:\t\t#{entry.email}\nPhone numbers:\t#{entry.phone_numbers.join(" ")}\n".colorize(:yellow)}
     else
-      puts "\nContact not found!"
+      puts "Contact not found!".colorize(:red)
     end
   end
 
@@ -168,7 +169,7 @@ class Application
       end
     end
     contact.save
-    puts 'Ok, here\'s the updated information:'
+    puts 'Ok, here\'s the updated information:'.colorize(:green)
     print_match(contact)
   end
 
