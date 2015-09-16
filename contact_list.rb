@@ -43,30 +43,30 @@ class Application
       end
 
     when 'update'
-      puts 'Which contact do you want to update? Please give me the id:'.colorize(:red)
+      puts 'Which contact do you want to update? Please give me the id:'.colorize(:blue)
       id_to_update = $stdin.readline().chomp.to_i
       puts "Current information for contact with ID #{id_to_update}:".colorize(:green)
       print_match(Contact.find(id_to_update))
-      puts "\nWhat do you want to update? 1 for first name, 2 for last name, 3 for email, 4 for phone numbers:".colorize(:red)
+      puts "\nWhat do you want to update? 1 for first name, 2 for last name, 3 for email, 4 for phone numbers:".colorize(:blue)
       update_option = $stdin.readline().chomp
       case update_option
       when '1'
         field_to_update = 'first name'
-        print 'Insert new first name: '.colorize(:red)
+        print 'Insert new first name: '.colorize(:blue)
         new_value = $stdin.readline().chomp
       when '2'
         field_to_update = 'last name'
-        print 'Insert new last name: '.colorize(:red)
+        print 'Insert new last name: '.colorize(:blue)
         new_value = $stdin.readline().chomp
       when '3'
         field_to_update = 'email'
-        print 'Insert new email: '.colorize(:red)
+        print 'Insert new email: '.colorize(:blue)
         new_value = $stdin.readline().chomp
       when '4'
         field_to_update = 'phone numbers'
-        print 'Which phone number to update? (e.g. mobile, home) '.colorize(:red)
+        print 'Which phone number to update? (e.g. mobile, home) '.colorize(:blue)
         ph_number_option = $stdin.readline().chomp
-        print 'Insert new value: '.colorize(:red)
+        print 'Insert new value: '.colorize(:blue)
         new_value = $stdin.readline().chomp
       end
       update_contact(id_to_update, field_to_update, new_value, ph_number_option)
