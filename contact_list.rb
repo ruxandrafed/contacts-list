@@ -68,6 +68,8 @@ class Application
         ph_number_option = $stdin.readline().chomp
         print 'Insert new value: '.colorize(:blue)
         new_value = $stdin.readline().chomp
+      else
+        print "No such option!".colorize(:red)
       end
       update_contact(id_to_update, field_to_update, new_value, ph_number_option)
     end
@@ -164,9 +166,9 @@ class Application
     when 'email'
       contact.email = new_value
     when 'phone numbers'
-      contact.phone_numbers.each do |phone_no|
+        contact.phone_numbers.map do |phone_no|
         phone_no[1] = new_value if phone_no[0] == ph_number_option
-      end
+        end
     end
     contact.save
     puts 'Ok, here\'s the updated information:'.colorize(:green)
