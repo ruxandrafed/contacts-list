@@ -17,6 +17,9 @@ class Contact
   def save
     if @id
       Contact.run_query("UPDATE contacts SET firstname=$1, lastname=$2, email=$3 WHERE id=$4 RETURNING id;", [@firstname, @lastname, @email, @id])
+      @phone_numbers.each do |arr|
+        Contact.connection.exec_params("UPDATE phone_numbers SET number=$1, type=$2, owner_id=$3 WHERE id=$3 RETURNING id;", [arr[1], arr[0], id])
+      end
     else
       id = Contact.connection.exec_params("INSERT INTO contacts (firstname, lastname, email) VALUES ($1, $2, $3) RETURNING id;", [@firstname, @lastname, @email])[0]['id'].to_i
       @phone_numbers.each do |arr|

@@ -15,13 +15,17 @@ class Application
   # Runs application
   def run
     case @command
+
     when 'help'
       print_help
+
     when 'new'
       contact_info = get_contact_info
       Contact.create(contact_info[0], contact_info[1], contact_info[2], contact_info[3]) if contact_info != nil
+
     when 'list'
       list_contacts(Contact.all)
+
     when 'show'
       print_match(Contact.find(@command_param))
     when 'findF'
@@ -30,6 +34,7 @@ class Application
       print_matches(Contact.find_all_by_lastname(@command_param))
     when 'findE'
       print_match(Contact.find_by_email(@command_param))
+
     when 'delete'
       if Contact.find(@command_param)
         Contact.delete(@command_param)
@@ -37,7 +42,37 @@ class Application
       else
         puts "No contact with this ID!"
       end
+
+    when 'update'
+      puts 'Which contact do you want to update? Please give me the id:'
+      id_to_update = $stdin.readline().chomp.to_i
+      puts "Current information for contact with ID #{id_to_update}:"
+      print_match(Contact.find(id_to_update))
+      puts "\nWhat do you want to update? 1 for first name, 2 for last name, 3 for email, 4 for phone numbers:"
+      update_option = $stdin.readline().chomp
+      case update_option
+      when '1'
+        field_to_update = 'first name'
+        puts 'Insert new first name:'
+        new_value = $stdin.readline().chomp
+      when '2'
+        field_to_update = 'last name'
+        puts 'Insert new last name:'
+        new_value = $stdin.readline().chomp
+      when '3'
+        field_to_update = 'email'
+        puts 'Insert new email:'
+        new_value = $stdin.readline().chomp
+      when '4'
+        field_to_update = 'phone numbers'
+        puts 'Which phone number to update? (e.g. mobile, home)'
+        ph_number_option = $stdin.readline().chomp
+        puts 'Insert new value:'
+        new_value = $stdin.readline().chomp
+      end
+      update_contact(id_to_update, field_to_update, new_value, ph_number_option)
     end
+
   end
 
   private
@@ -51,6 +86,7 @@ class Application
     puts '- findF - Find a contact by first name'
     puts '- findL - Find a contact by last name'
     puts '- findE - Find a contact by email'
+    puts '- update - Update contact info by id'
     puts '- delete - Delete a contact by id'
   end
 
@@ -67,19 +103,25 @@ class Application
         puts 'Enter last name:'
         lastname = $stdin.readline().chomp
 
-        list_of_numbers = []
-        keep_looping = true
-        while keep_looping
+        @list_of_numbers = []
+        @keep_looping = true
+        read_phone_numbers
+        return [firstname, lastname, email, read_phone_numbers]
+    end
+  end
+
+  # Prompts user for multiple phone numbers; returns array of phone numbers (array of arrays)
+  def read_phone_numbers
+    while @keep_looping
           puts 'Enter phone number: (e.g. mobile 6046783456) or DONE if finished'
           user_input = $stdin.readline.chomp
           if user_input == 'DONE'
-            keep_looping = false
+            @keep_looping = false
           else
-            list_of_numbers << user_input.split(" ")
+            @list_of_numbers << user_input.split(" ")
           end
-        end
-        return [firstname, lastname, email, list_of_numbers]
     end
+    return @list_of_numbers
   end
 
   # Takes an array of Contact instances and outputs five at a time, with more shown when user hits space
@@ -87,7 +129,7 @@ class Application
     puts 'Showing list of contacts (to see more than five, press space):'
     index = 0
     while index < arr.size
-      arr[index,5].each{|entry| puts "ID #{entry.id} | First name: #{entry.firstname} | Last name: #{entry.lastname} | Email: #{entry.email} | Phone numbers: #{entry.phone_numbers.join(" ")}"}
+      arr[index,5].each{|entry| puts "\nID:\t\t#{entry.id}\nFirst name:\t#{entry.firstname}\nLast name:\t#{entry.lastname}\nEmail:\t\t#{entry.email}\nPhone numbers:\t#{entry.phone_numbers.join(" ")}"}
       keep_showing = $stdin.getch
       break if keep_showing != " "
       index += 5
@@ -97,7 +139,7 @@ class Application
   # Takes a Contact instance and outputs info about it
   def print_match(entry)
     if entry
-      puts "\nFirst name:\t#{entry.firstname}\nLast name:\t#{entry.lastname}\nEmail:\t#{entry.email}\nPhone numbers:\t#{entry.phone_numbers.join(" ")}"
+      puts "\nID:\t\t#{entry.id}\nFirst name:\t#{entry.firstname}\nLast name:\t#{entry.lastname}\nEmail:\t\t#{entry.email}\nPhone numbers:\t#{entry.phone_numbers.join(" ")}"
     else
       puts "\nContact not found!"
     end
@@ -105,11 +147,31 @@ class Application
 
   # Takes an array of Contact instances and outputs info about each
   def print_matches(matches)
-    if matches
-      matches.each {|entry| puts "\nFirst name:\t#{entry.firstname}\nLast name:\t#{entry.lastname}\nEmail:\t#{entry.email}\nPhone numbers:\t#{entry.phone_numbers.join(" ")}\n"}
+    if matches != []
+      matches.each {|entry| puts "\nID:\t\t#{entry.id}\nFirst name:\t#{entry.firstname}\nLast name:\t#{entry.lastname}\nEmail:\t\t#{entry.email}\nPhone numbers:\t#{entry.phone_numbers.join(" ")}\n"}
     else
       puts "\nContact not found!"
     end
+  end
+
+  # Updates a contact in the database
+  def update_contact(id, field, new_value, ph_number_option = nil)
+    contact = Contact.find(id)
+    case field
+    when 'first name'
+      contact.firstname = new_value
+    when 'last name'
+      contact.lastname = new_value
+    when 'email'
+      contact.email = new_value
+    when 'phone numbers'
+      contact.phone_numbers.each do |phone_no|
+        phone_no[1] = new_value if phone_no[0] == ph_number_option
+      end
+    end
+    contact.save
+    puts 'Ok, here\'s the updated information:'
+    print_match(contact)
   end
 
 end
