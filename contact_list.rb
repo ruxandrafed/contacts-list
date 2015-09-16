@@ -1,6 +1,5 @@
 #!/usr/bin/ruby
 require 'io/console'
-require_relative 'contact_database'
 require_relative 'contact'
 
 @filename = 'contacts.csv'
