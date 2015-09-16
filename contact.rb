@@ -4,28 +4,30 @@ require 'pg'
 
 class Contact
 
-  attr_accessor :firstname, :lastname, :email, :id
+  attr_accessor :firstname, :lastname, :email, :id, :phone_numbers
 
-  def initialize(firstname, lastname, email, id=nil)
+  def initialize(firstname, lastname, email, phone_numbers = [], id = nil)
     @firstname = firstname
     @lastname = lastname
     @email = email
+    @phone_numbers = phone_numbers
     @id = id
-  end
-
-  def to_s
-    "Name: #{@name}, Email: #{email}"
   end
 
   # Updates or saves a contact to the database, returns the id
   def save
     if @id
-      Contact.connection.exec_params("UPDATE contacts SET firstname=$1, lastname=$2, email=$3 WHERE id=$4 RETURNING id;", [@firstname, @lastname, @email, @id])
+      Contact.run_query("UPDATE contacts SET firstname=$1, lastname=$2, email=$3 WHERE id=$4 RETURNING id;", [@firstname, @lastname, @email, @id])
     else
-      Contact.connection.exec_params("INSERT INTO contacts (firstname, lastname, email) VALUES ($1, $2, $3) RETURNING id;", [@firstname, @lastname, @email])
+      id = Contact.connection.exec_params("INSERT INTO contacts (firstname, lastname, email) VALUES ($1, $2, $3) RETURNING id;", [@firstname, @lastname, @email])[0]['id'].to_i
+      @phone_numbers.each do |arr|
+        Contact.connection.exec_params("INSERT INTO phone_numbers (number, type, owner_id) VALUES ($1, $2, $3) RETURNING id;", [arr[1], arr[0], id])
+      end
+      return id
     end
   end
 
+  # Deletes the instance from the database
   def destroy
     Contact.connection.exec_params("DELETE FROM contacts WHERE id = $1;", [@id])
   end
@@ -43,8 +45,8 @@ class Contact
     end
 
     # Initializes a contact and adds it to the list of contacts
-    def create(firstname, lastname, email)
-      contact = Contact.new(firstname, lastname, email)
+    def create(firstname, lastname, email, phone_numbers)
+      contact = Contact.new(firstname, lastname, email, phone_numbers)
       contact.id = contact.save
     end
 
@@ -73,24 +75,28 @@ class Contact
       run_query("SELECT * FROM contacts;")
     end
 
+    # Calls the destroy method on the instance that has that id; returns a PG::Result
     def delete(id)
-      if find(id)
-        find(id).destroy
-        puts "Contact with id #{id} was deleted!"
-      else
-          puts "No contact with this ID!"
-          nil
-      end
+      find(id).destroy
     end
 
     # Takes a SQL query and params and returns an array of matching Contact instances
     def run_query(query, params=nil)
       matching_contacts = []
       connection.exec_params(query, params).each do |row|
-        contact = Contact.new(row['firstname'], row['lastname'], row['email'], row['id'].to_i)
+        contact = Contact.new(row['firstname'], row['lastname'], row['email'], get_phone_numbers(row['id']), row['id'].to_i)
       matching_contacts << contact
       end
       return matching_contacts
+    end
+
+    # Takes an ID and returns phone numbers for that ID (an array of arrays)
+    def get_phone_numbers(id)
+      all_phone_numbers = []
+      connection.exec_params("SELECT * FROM phone_numbers WHERE owner_id = $1", [id]).each do |phone_no|
+        all_phone_numbers << [phone_no['type'], phone_no['number']]
+      end
+      return all_phone_numbers
     end
 
   end
