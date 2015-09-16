@@ -2,8 +2,6 @@
 require 'io/console'
 require_relative 'contact'
 
-@filename = 'contacts.csv'
-
 class Application
 
   # Initializes class and gets the command and command param from user input
