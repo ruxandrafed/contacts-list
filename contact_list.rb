@@ -118,13 +118,13 @@ class Application
         new_contact = Contact.create(firstname: firstname, lastname: lastname, email: email)
         @all_numbers = []
         @keep_looping = true
-        new_contact.phone_numbers = read_phone_numbers
-        return [firstname, lastname, email, read_phone_numbers]
+        new_contact.phone_numbers = get_phone_numbers
+        return [firstname, lastname, email, get_phone_numbers]
     end
   end
 
   # Prompts user for multiple phone numbers; returns array of phone numbers (array of arrays)
-  def read_phone_numbers
+  def get_phone_numbers
     while @keep_looping
           puts "Enter phone number: (e.g. mobile 604..; use mobile1, mobile2 if multiple). Type 'done' if finished".colorize(:blue)
           user_input = $stdin.readline.chomp
