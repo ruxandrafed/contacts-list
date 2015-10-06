@@ -95,7 +95,7 @@ class Contact
     # Takes an ID and returns phone numbers for that ID (an array of arrays)
     def get_phone_numbers(id)
       all_phone_numbers = []
-      connection.exec_params("SELECT * FROM phone_numbers WHERE owner_id = $1", [id]).each do |phone_no|
+      connection.exec_params("SELECT * FROM phone_numbers WHERE contact_id = $1", [id]).each do |phone_no|
         all_phone_numbers << [phone_no['type'], phone_no['number']]
       end
       return all_phone_numbers
